@@ -52,4 +52,7 @@ dependencies {
     implementation "net.e175.klaus:solarpositioning:0.0.9"
 
     implementation 'com.github.robinkrsingh:easylocation:0.1.0'
+
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation "android.arch.lifecycle:viewmodel:1.1.1"
 }

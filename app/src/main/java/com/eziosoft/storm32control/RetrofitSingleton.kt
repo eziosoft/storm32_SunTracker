@@ -26,12 +26,13 @@ object RetrofitSingleton {
 }
 
 interface RetrofitInterface {
-    @GET("https://www.n2yo.com/rest/v1/satellite/positions/{id}/{lat}/{lon}/{alt}/1/&apiKey={key}")
+    @GET("https://www.n2yo.com/rest/v1/satellite/positions/{id}/{lat}/{lon}/{alt}/{seconds}/&apiKey={key}")
     fun getSatPosition(
         @Path("id") catalogNumber: Int,
         @Path("lat") lat: Double,
         @Path("lon") lon: Double,
-        @Path("alt") alt:Double,
-        @Path("key") APIKey: String
+        @Path("alt") alt: Double,
+        @Path("key") APIKey: String,
+        @Path("seconds") seconds: Int
     ): Call<SATPosition>
 }

@@ -205,11 +205,12 @@ class MainActivity : AppCompatActivity() {
                             lat,
                             lon,
                             alt,
-                            APIKey
+                            APIKey,
+                            1
                         )
                     call.enqueue(object : Callback<SATPosition> {
                         override fun onFailure(call: Call<SATPosition>, t: Throwable) {
-                            print("debug: onFailure " + t.message)
+                            Log.d("aaa","debug: onFailure " + t.message)
                         }
 
                         override fun onResponse(
