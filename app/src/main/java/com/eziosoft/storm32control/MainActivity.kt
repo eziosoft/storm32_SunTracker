@@ -189,16 +189,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    var querry = true //to not querry too fast
     private fun getSatellitePosition() {
         CoroutineScope(Main).launch {
             val retrofit = RetrofitSingleton.getInstance()
-            var querry = true //to not querry too fast
 
             while (switch1.isChecked) {
                 delay(1000)
                 if (querry) {
-                    Log.d("aaa", "Loop")
+                    Log.d("aaa", "GET")
                     val call = retrofit.create(RetrofitInterface::class.java)
                         .getSatPosition(
                             catalogNumberET.text.toString().toInt(),
@@ -206,11 +205,11 @@ class MainActivity : AppCompatActivity() {
                             lon,
                             alt,
                             APIKey,
-                            1
+                            60
                         )
                     call.enqueue(object : Callback<SATPosition> {
                         override fun onFailure(call: Call<SATPosition>, t: Throwable) {
-                            Log.d("aaa","debug: onFailure " + t.message)
+                            Log.d("aaa", "debug: onFailure " + t.message)
                         }
 
                         override fun onResponse(
@@ -218,41 +217,7 @@ class MainActivity : AppCompatActivity() {
                             response: Response<SATPosition>
                         ) {
 
-                            if (response.isSuccessful) {
-                                Log.d("aaa", "debug: response is successful")
-                                Log.d("aaa", "debug: " + response.raw().body())
-                                val satAzimuth = response.body()!!.positions[0].azimuth
-                                val satElevation = response.body()!!.positions[0].elevation
-
-
-                                val satElevation1 = -satElevation
-                                var satAzimuth1 = 360 - satAzimuth
-                                if (satAzimuth1 > 180.0)
-                                    satAzimuth1 -= 360
-
-                                sb1.progress = satElevation1.toInt()
-                                sb3.progress = satAzimuth1.toInt()
-
-                                if (state == BluetoothState.STATE_CONNECTED) { //not send command when in auto mode
-                                    bt.send(
-                                        storm32.setCameraAngle(
-                                            satElevation1.toFloat(),
-                                            sb2.progress.toFloat(),
-                                            satAzimuth1.toFloat()
-                                        ), false
-                                    )
-                                }
-
-                                val s =
-                                    response.body()!!.info.satname + ": elev:$satElevation , azi:$satAzimuth\n" +
-                                            "$satElevation1, $satAzimuth1"
-                                textView.text = s
-                                querry = true
-                            } else {
-                                Log.d("aaa", "debug: unsuccesful " + response.code())
-                                Log.d("aaa", "debug: " + response.raw())
-
-                            }
+                            getSatData(response)
                         }
                     })
                 }
@@ -261,6 +226,51 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    private fun getSatData(response: Response<SATPosition>) {
+        CoroutineScope(Main).launch {
+
+            if (response.isSuccessful) {
+                for (i in response.body()!!.positions.indices) {
+                    Log.d("aaa", "debug: response is successful")
+                    Log.d("aaa", "debug: " + response.raw().toString())
+                    val satAzimuth = response.body()!!.positions[i].azimuth
+                    val satElevation = response.body()!!.positions[i].elevation
+
+
+                    val satElevation1 = -satElevation
+                    var satAzimuth1 = 360 - satAzimuth
+                    if (satAzimuth1 > 180.0)
+                        satAzimuth1 -= 360
+
+                    sb1.progress = satElevation1.toInt()
+                    sb3.progress = satAzimuth1.toInt()
+
+                    Log.i("aaa","UPDATE STORM32, $satElevation1, $satAzimuth1")//not send command when in auto mode
+                    if (state == BluetoothState.STATE_CONNECTED) {
+                        bt.send(
+                            storm32.setCameraAngle(
+                                satElevation1.toFloat(),
+                                sb2.progress.toFloat(),
+                                satAzimuth1.toFloat()
+                            ), false
+                        )
+                    }
+
+                    val s =
+                        response.body()!!.info.satname + ": elev:$satElevation , azi:$satAzimuth\n" +
+                                "$satElevation1, $satAzimuth1"
+                    textView.text = s
+                    delay(1000)
+                }
+
+                querry = true
+            } else {
+                Log.d("aaa", "debug: unsuccesful " + response.code())
+                Log.d("aaa", "debug: " + response.raw())
+            }
+        }
     }
 
 
