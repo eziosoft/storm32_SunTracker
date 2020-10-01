@@ -28,7 +28,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     //setup
-    private val APIKey =
+    private val APIKey
         "WY8LM4-8AJ8Y6-PQ88ZE-4CV0" //https://www.n2yo.com/ api key PLEASE DON'T USE IT
     private val stormMAC = "20:15:12:17:72:52" // Bluetooth device MAC address
     private var lat = 48.00 //position latitude
