@@ -16,4 +16,12 @@ class ExampleUnitTest {
         val time = GregorianCalendar.getInstance()
        println(time)
     }
+
+    @Test
+    fun testTest()
+    {
+        println("hello world!")
+
+    }
+
 }
