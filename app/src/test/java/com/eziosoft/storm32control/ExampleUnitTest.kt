@@ -21,7 +21,7 @@ class ExampleUnitTest {
     fun testTest()
     {
         println("hello world!")
-
+        assert(false)
     }
 
 }
